@@ -14,23 +14,21 @@ extern "C"
 
 int main()
 {
-    std::cout << "CT polymorphism: "
+    std::cout << "Basic CT polymorphism: "
               << SharedAdder(2, 2)
               << std::endl;
 
     using funT = int (*) (int, int);
-    HINSTANCE hinstDLL;
+    HINSTANCE hinstDLL = LoadLibrary(TEXT(R"(./Dll.dll)"));
     BOOL fFreeDLL = false;
     
-    hinstDLL = LoadLibrary(TEXT(R"(./Dll.dll)"));
-    if (hinstDLL != NULL)
+    if (hinstDLL)
     {
-        auto f = reinterpret_cast<funT>(GetProcAddress(hinstDLL, "SharedAdder"));
-        if (f != NULL)
-        {
-            std::cout << "RT polymorphism: " 
+        std::string name; std::cin >> name;
+        auto f = reinterpret_cast<funT>(GetProcAddress(hinstDLL, name.c_str()));
+        if (f)
+            std::cout << "Ultimate RT polymorphism: " 
                       << f(3, 3) << std::endl;
-        }
         fFreeDLL = FreeLibrary(hinstDLL);
     }
     return fFreeDLL == 0;
