@@ -7,14 +7,16 @@
 #include <windows.h>
 #include <WinUser.h>
 
+// If one doesn't have the header file...
 extern "C"
 {
-    int __declspec(dllimport)  SharedAdder(int, int);
+    // '__declspec(dllimport)' says the linker to look for an f-body rather out-there
+    int __declspec(dllimport)  SharedAdder(int, int); 
 }
 
 int main()
 {
-    std::cout << "Basic CT polymorphism: "
+    std::cout << "Basic LT polymorphism: "
               << SharedAdder(2, 2)
               << std::endl;
 
