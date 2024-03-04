@@ -2,11 +2,14 @@
 #include "pch.h"
 #include "dllmain.h"
 
-int SharedAdder(int a, int b)
+extern "C"
 {
-    return a + b;
+    int SharedAdder(int a, int b)
+    {
+        return a + b;
+    }
 }
-BOOL APIENTRY DllMain( HMODULE hModule,
+BOOL APIENTRY DllMain(HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
                      )
