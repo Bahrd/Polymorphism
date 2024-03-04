@@ -9,49 +9,41 @@
 #include <windows.h>
 #include <WinUser.h>
 
-
 extern "C" int SharedAdder(int a, int b);
 
 int main()
-{
-    std::cout << "LT polymorphism: "
-              << SharedAdder(1, 2) << std::endl;
-    BOOL fFreeDLL = false;    
-    if (HINSTANCE hinstDLL = LoadLibrary(LR"(./Dll.dll)"))
+{   
+    BOOL fFreeDLL = false;
+    
+    std::string bib, fun;
+    std::cin >> bib >> fun;
+    
+    auto wbib = LR"(.\)" + std::wstring(bib.begin(), bib.end()) + L".dll";
+    if (auto hinstDLL = LoadLibrary(wbib.c_str()))
     {
-        std::string name; std::cin >> name;
+        if (auto _f = GetProcAddress(hinstDLL, fun.c_str()))
         {
-            using funT = int (*) (int, int);
-            auto f = reinterpret_cast<funT>(GetProcAddress(hinstDLL, name.c_str()));
-            if (f)
-            {
-                auto af = std::async(std::launch::deferred, f, 1, 2);
+            typedef unsigned int (*fun_t) (int, int);
 
-                std::cout << "Ultimate RT polymorphism: "
-                          << f(1, 2) << std::endl
-                          << "Ultimate lazy RT polymorphism: "
-                          << af.get() << std::endl;
-            }
+            auto f = reinterpret_cast<fun_t>(_f);
+            auto [bf, af] = std::tuple(std::bind(f, -1, 1), std::async(f, 1, -1));
+            
+            std::cout << "Penultimate eager RT polymorphism: " << bf() << std::endl
+                      << "Ultimately lazy RT polymorphism: " << af.get() << std::endl;
         }
+        using fubar_t = int (*) (int);
+        if (auto f = reinterpret_cast<fubar_t>(GetProcAddress(hinstDLL, fun.c_str())))
         {
-            typedef int (*funT) (int);
-            auto f = reinterpret_cast<funT>(GetProcAddress(hinstDLL, name.c_str()));
-            if (f)
-            {
-                std::println("FUBAR polymorphism: {}", f(1));
-                std::cout << "FUBAR polymorphism: "
-                          << f(1) << std::endl;
-            }
+            std::println("FUBAR polymorphism  I: {}", f(1));
+            std::cout << "FUBAR polymorphism II: " << f(-1) << std::endl;
         }
+        using fugazi_t = long double (*) (int, int, std::string);
+        if (auto f = reinterpret_cast<fugazi_t>(GetProcAddress(hinstDLL, fun.c_str())))
         {
-            using funT = int (*) (int, int, std::string);
-            auto f = reinterpret_cast<funT>(GetProcAddress(hinstDLL, name.c_str()));
-            if (f)
-            {
-                std::println(std::cout, "FUGAZI polymorphism: {}", f(1, 2, "Have you ever tried this?"));
-            }
+            std::println(std::cout, "FUGAZI polymorphism: {}", f(-1, 1, "Have you ever tried this?"));
         }
         fFreeDLL = FreeLibrary(hinstDLL);
     }
+    std::cout << "Ol'good LT polymorphism: " << SharedAdder(1, -1) << std::endl;
     return fFreeDLL == 0;
 }
