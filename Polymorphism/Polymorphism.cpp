@@ -1,4 +1,4 @@
-// Polymorphism.cpp : This file contains the 'main' function. Program execution begins and ends there.
+﻿// Polymorphism.cpp : This file contains the 'main' function. Program execution begins and ends there.
 // https://docs.microsoft.com/en-us/troubleshoot/windows-client/deployment/dynamic-link-library
 // https://docs.microsoft.com/en-us/cpp/build/walkthrough-creating-and-using-a-dynamic-link-library-cpp
 // About move semantics:
@@ -37,7 +37,7 @@ int main()
         if (auto f = reinterpret_cast<fubar_t>(GetProcAddress(hinstDLL, fun.c_str())))
         {
             std::println("FUBAR polymorphism  I: {}", f(a + b)),
-            std::cout << "FUBAR polymorphism II: " << f(a + b) << std::endl;
+            std::wcout << L"FUBAR polymorphism II: " << f(a + b) << std::endl;
         }
         using fugazi_t = long double (*) (char, int, std::string);
         if (auto f = reinterpret_cast<fugazi_t>(GetProcAddress(hinstDLL, fun.c_str())))
