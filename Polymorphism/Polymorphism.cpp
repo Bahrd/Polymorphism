@@ -28,12 +28,12 @@ int main()
         {
             typedef int (*fun_t) (int, int);
             auto &&tf = std::move(reinterpret_cast<fun_t>(f));
-            auto [bf, af, lf] = std::tuple(std::bind(tf, a, b), std::async(tf, a, b), 
-                                           std::async(std::launch::deferred, [&tf, &a, &b] { return tf(a, b); }));
+            auto [bf, af, alf] = std::tuple(std::bind(tf, a, b), std::async(tf, a, b), 
+                                            std::async(std::launch::deferred, [&tf, &a, &b] { return tf(a, b); }));
             
             std::cout << "Ultimately RT eager p'phism: " << bf() << std::endl
                       << "Potentially lazy RT p'phism: " << af.get() << std::endl
-                      << "Penultimately slacky RT p'phism: " << lf.get() << std::endl;
+                      << "Penultimate slacky RT p'phism: " << alf.get() << std::endl;
         }
         using fubar_t = unsigned int (*) (int);
         if (auto f = reinterpret_cast<fubar_t>(GetProcAddress(hinstDLL, fun.c_str())))

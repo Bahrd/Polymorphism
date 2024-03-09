@@ -5,9 +5,15 @@
 #include "pch.h"
 #include "dllmain.h"
 
-
 template <typename T, typename U>
-auto LocalAdder(T t, U u) -> decltype(t + u)
+concept additive = requires(T t, U u)
+{
+    t + u;
+};
+
+template <typename T, typename U> 
+requires additive<T, U>
+auto LocalAdder(T &&t, U &&u) -> decltype(t + u)
 {
     return t + u;
 }
