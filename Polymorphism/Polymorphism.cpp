@@ -28,26 +28,28 @@ int main()
         {
             typedef int (*fun_t) (int, int);
             auto &&tf = std::move(reinterpret_cast<fun_t>(f));
-            auto [bf, af] = std::pair(std::bind(tf, a, b), std::async(tf, a, b));
+            auto [bf, af, lf] = std::tuple(std::bind(tf, a, b), std::async(tf, a, b), 
+                                           std::async(std::launch::deferred, [&tf, &a, &b] { return tf(a, b); }));
             
-            std::cout << "Penultimate RT eager polymorphism: " << bf() << std::endl
-                      << "Ultimately lazy RT polymorphism: " << af.get() << std::endl;
+            std::cout << "Ultimately RT eager p'phism: " << bf() << std::endl
+                      << "Potentially lazy RT p'phism: " << af.get() << std::endl
+                      << "Penultimately slacky RT p'phism: " << lf.get() << std::endl;
         }
         using fubar_t = unsigned int (*) (int);
         if (auto f = reinterpret_cast<fubar_t>(GetProcAddress(hinstDLL, fun.c_str())))
         {
-            std::println("FUBAR'ed polymorphism  I: {}", f(a + b)),
-            std::wcout << L"FUBAR'ed polymorphism II: " << f(a + b) << std::endl;
+            std::println("FUBAR'ed p'phism  I: {}", f(a + b)),
+            std::wcout << L"FUBAR'ed p'phism II: " << f(a + b) << std::endl;
         }
         using fugazi_t = long double (*) (char, int, std::string);
         if (auto f = reinterpret_cast<fugazi_t>(GetProcAddress(hinstDLL, fun.c_str())))
         {
-            std::println(std::cout, "FUGAZI'fied polymorphism: {}", f(a, b, "Have you ever tried this?"));
+            std::println(std::cout, "FUGAZI'fied p'phism: {}", f(a, b, "Have you ever tried this?"));
         }
         return FreeLibrary(hinstDLL) == 0;
     }
     else
     {
-        return std::cout << "Good ol' LT polymorphism: " << SharedAdder(a, b) << std::endl, 0;
+        return std::cout << "Good ol' LT p'phism: " << SharedAdder(a, b) << std::endl, 0;
     }
 }
