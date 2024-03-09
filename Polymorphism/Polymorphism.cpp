@@ -18,13 +18,13 @@ extern "C" int SharedAdder(int, int);
 
 int main()
 {    
-    std::string bib, fun; int a, b;
-    std::cin >> bib >> fun >> a >> b;  
+    std::string _bib, _fun; int a, b;
+    std::cin >> _bib >> _fun >> a >> b;  
 
-    auto wbib = LR"(.\)" + std::wstring(bib.begin(), bib.end()) + L".dll";
-    if (auto hinstDLL = LoadLibraryW(wbib.c_str()))
+    auto [bib, fun] = std::pair(LR"(.\)" + std::wstring(_bib.begin(), _bib.end()) + L".dll", _fun.c_str());
+    if (auto hinstDLL = LoadLibraryW(bib.c_str()))
     {
-        if (auto &&f = GetProcAddress(hinstDLL, fun.c_str()))
+        if (auto &&f = GetProcAddress(hinstDLL, fun))
         {
             typedef int (*fun_t) (int, int);
             auto &&tf = std::move(reinterpret_cast<fun_t>(f));
@@ -36,13 +36,13 @@ int main()
                       << "Penultimate slacky RT p'phism: " << alf.get() << std::endl;
         }
         using fubar_t = unsigned int (*) (int);
-        if (auto f = reinterpret_cast<fubar_t>(GetProcAddress(hinstDLL, fun.c_str())))
+        if (auto f = reinterpret_cast<fubar_t>(GetProcAddress(hinstDLL, fun)))
         {
             std::println("FUBAR'ed p'phism  I: {}", f(a + b)),
             std::wcout << L"FUBAR'ed p'phism II: " << f(a + b) << std::endl;
         }
         using fugazi_t = long double (*) (char, int, std::string);
-        if (auto f = reinterpret_cast<fugazi_t>(GetProcAddress(hinstDLL, fun.c_str())))
+        if (auto f = reinterpret_cast<fugazi_t>(GetProcAddress(hinstDLL, fun)))
         {
             std::println(std::cout, "FUGAZI'fied p'phism: {}", f(a, b, "Have you ever tried this?"));
         }
