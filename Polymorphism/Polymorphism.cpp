@@ -24,31 +24,30 @@ int main()
     auto wbib = LR"(.\)" + std::wstring(bib.begin(), bib.end()) + L".dll";
     if (auto hinstDLL = LoadLibraryW(wbib.c_str()))
     {
-        if (auto f = GetProcAddress(hinstDLL, fun.c_str()))
+        if (auto &&f = GetProcAddress(hinstDLL, fun.c_str()))
         {
             typedef int (*fun_t) (int, int);
-            auto tf = std::move(reinterpret_cast<fun_t>(f));
+            auto &&tf = std::move(reinterpret_cast<fun_t>(f));
             auto [bf, af] = std::pair(std::bind(tf, a, b), std::async(tf, a, b));
             
-            std::cout << "Penultimate eager RT polymorphism: " << bf() << std::endl
-                      << "Ultimately RT lazy polymorphism: " << af.get() << std::endl;
+            std::cout << "Penultimate RT eager polymorphism: " << bf() << std::endl
+                      << "Ultimately lazy RT polymorphism: " << af.get() << std::endl;
         }
         using fubar_t = unsigned int (*) (int);
         if (auto f = reinterpret_cast<fubar_t>(GetProcAddress(hinstDLL, fun.c_str())))
         {
-            std::println("FUBAR polymorphism  I: {}", f(a + b)),
-            std::wcout << L"FUBAR polymorphism II: " << f(a + b) << std::endl;
+            std::println("FUBAR'ed polymorphism  I: {}", f(a + b)),
+            std::wcout << L"FUBAR'ed polymorphism II: " << f(a + b) << std::endl;
         }
         using fugazi_t = long double (*) (char, int, std::string);
         if (auto f = reinterpret_cast<fugazi_t>(GetProcAddress(hinstDLL, fun.c_str())))
         {
-            std::println(std::cout, "FUGAZI polymorphism: {}", f(a, b, "Have you ever tried this?"));
+            std::println(std::cout, "FUGAZI'fied polymorphism: {}", f(a, b, "Have you ever tried this?"));
         }
         return FreeLibrary(hinstDLL) == 0;
     }
     else
     {
-        std::cout << "Ol'good LT polymorphism: " << SharedAdder(a, b) << std::endl;
-        return 0;
+        return std::cout << "Good ol' LT polymorphism: " << SharedAdder(a, b) << std::endl, 0;
     }
 }
