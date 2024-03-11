@@ -38,7 +38,7 @@ int main()
         using fubar_t = unsigned int (*) (int);
         if (auto f = reinterpret_cast<fubar_t>(GetProcAddress(hinstDLL, fun)))
         {
-            std::println("FUBAR'ed p'phism  I: {}", f(a + b)),
+            std::println("SNAFU'd p'phism  I: {}", f(a + b)),
             std::wcout << L"FUBAR'ed p'phism II: " << f(a + b) << std::endl;
         }
         using fugazi_t = long double (*) (char, int, std::string);
