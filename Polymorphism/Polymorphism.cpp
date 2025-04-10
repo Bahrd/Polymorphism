@@ -81,10 +81,8 @@ int main()
     }
     else
     {
-        return cout << "Good ol' LT p'phism: " 
-                    << SharedAdder(std::to_string(a), std::to_string(b)) 
-                    << " = " 
-                    << SharedAdder(a, b) << endl
-                    << "Nice'n'dandy!", 0;
+        return cout << "Good ol' LT p'phism: " << endl
+                    << SharedAdder(std::to_string(a), std::to_string(b)) << " = " << SharedAdder(a, b) << endl
+                    << "Fine'n'dandy!", 0;
     }
 }
