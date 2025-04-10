@@ -6,22 +6,26 @@
     Hacker's kindergarden: 
     https://en.wikipedia.org/wiki/Stack_buffer_overflow#Exploiting_stack_buffer_overflows
     https://arstechnica.com/information-technology/2015/08/how-security-flaws-work-the-buffer-overflow/
+
+     devenv .\Polymorphism.sln /Build "Debug|x64"
 */
 #include <future>
 #include <functional>
 #include <iostream>
 #include <print>
+#include <string>
 
 #include <windows.h>
 #include <WinUser.h>
 
 extern "C" int SharedAdder(int, int);
+extern std::string SharedAdder(std::string, std::string);
 
 int main()
 {    
     using namespace std;
     string _bib, _fun; int a, b;
-    cin >> _bib >> _fun // Dll  SharedAdder  
+    cin >> _bib >> _fun // Dll  SharedAdder
         >> a >> b;      // 4    4
 
     auto [bib, fun] = pair(LR"(.\)" + wstring(_bib.begin(), _bib.end()) + L".dll", _fun.c_str());
@@ -29,6 +33,15 @@ int main()
     {
         if (auto &&f = GetProcAddress(hinstDLL, fun))
         {
+            // Mangling is... "like a box of chocolates. You never know what you're gonna get!" ;)
+            // Never write a code like this... Please! please!! please!!!
+            if (_fun.contains("@"))
+            {
+                typedef std::string(*fun_t) (std::string, std::string);
+                auto&& tf = move(reinterpret_cast<fun_t>(f));
+                cout << tf(std::to_string(a), std::to_string(b)) << endl;
+                return 0;
+            }
             typedef int (*fun_t) (int, int);
             auto &&tf = move(reinterpret_cast<fun_t>(f));
             auto [bf, af, alf] = tuple(bind(tf, a, b), 
@@ -50,7 +63,7 @@ int main()
         using fubar_t = unsigned int (*) (int);
         if (auto f = reinterpret_cast<fubar_t>(GetProcAddress(hinstDLL, fun)))
         {
-            wcerr << L"FUBAR'ed p'phism  I: " << f(a + b) 
+            wcerr << L"FUBAR'ed p'phism  I: " << f(a + b)   
                   << endl;
         }
         using snafu_t = int (*) (unsigned int, unsigned char);
@@ -61,13 +74,17 @@ int main()
         using fugazi_t = long double (*) (char, int, string);
         if (auto f = reinterpret_cast<fugazi_t>(GetProcAddress(hinstDLL, fun)))
         {
-            println(clog, "FUGAZI'fied p'phism: {}", 
+            println(clog, "FUGAZI'fied p'phism: {}",        
                     f(a, b, "Have you ever tried this?"));
         }
         return FreeLibrary(hinstDLL) == 0;
     }
     else
     {
-        return cout << "Good ol' LT p'phism: " << SharedAdder(a, b) << endl, 0;
+        return cout << "Good ol' LT p'phism: " 
+                    << SharedAdder(std::to_string(a), std::to_string(b)) 
+                    << " = " 
+                    << SharedAdder(a, b) << endl
+                    << "Nice'n'dandy!", 0;
     }
 }
