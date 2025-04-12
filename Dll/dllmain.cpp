@@ -26,10 +26,10 @@ extern "C"
     } 
 }
 
-std::string __declspec(dllexport) SharedAdder(std::string a, std::string b)
+std::string SharedAdder(std::string a, std::string b)
 {
-    #define mangled_name "?SharedAdder@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V12@0@Z"
-    #pragma comment(linker, "/EXPORT:StringAdder=" mangled_name ",@102")
+#define unmangled_alias "?SharedAdder@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V12@0@Z"
+#pragma comment(linker, "/EXPORT:StringAdder=" unmangled_alias ",@102")
     return LocalAdder(a, b);
 }
 

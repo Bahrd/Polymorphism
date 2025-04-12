@@ -18,6 +18,7 @@
 #include <windows.h>
 #include <WinUser.h>
 
+// We could've included "dllmain.h" header here, but... ;)
 extern "C" int SharedAdder(int, int);
 extern std::string SharedAdder(std::string, std::string);
 
@@ -34,12 +35,13 @@ int main()
         if (auto &&f = GetProcAddress(hinstDLL, fun))
         {
             // Mangling is... "like a box of chocolates. You never know what you're gonna get!" ;)
-            // Never write a code like this... Please! please!! please!!!
-            if (_fun.contains("@"))
+            // Never write a code like this 'if(...){...}'! Please, please!! Pleeeeease!!!
+            // https://en.wikipedia.org/wiki/Name_mangling#Standardized_name_mangling_in_C++
+            if (_fun.contains("@@"))
             {
-                typedef std::string(*fun_t) (std::string, std::string);
-                auto&& tf = move(reinterpret_cast<fun_t>(f));
-                cout << tf(std::to_string(a), std::to_string(b)) << endl;
+                using str = string; using rope = str(*) (str, str);
+                auto&& tf = move(reinterpret_cast<rope>(f));
+                cout << tf(to_string(a), to_string(b)) << endl;
                 return 0;
             }
             typedef int (*fun_t) (int, int);
@@ -60,6 +62,8 @@ int main()
                   << endl;
             return -1;
         }
+        // You think strict type checking is obsolete and restrictive, huh? 
+        // Good for ya - keep thinking that, keeeeep thinking... "Just. Like. That." [ https://youtu.be/s_NQ9yUQ6cY?t=87 ];)
         using fubar_t = unsigned int (*) (int);
         if (auto f = reinterpret_cast<fubar_t>(GetProcAddress(hinstDLL, fun)))
         {
@@ -82,7 +86,7 @@ int main()
     else
     {
         return cout << "Good ol' LT p'phism: " << endl
-                    << SharedAdder(std::to_string(a), std::to_string(b)) << " = " << SharedAdder(a, b) << endl
+                    << SharedAdder(to_string(a), to_string(b)) << " = " << SharedAdder(a, b) << endl
                     << "Fine'n'dandy!", 0;
     }
 }
